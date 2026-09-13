@@ -40,7 +40,9 @@ könnte jeder, der Text schreiben darf, im Namen eines anderen handeln.
 wie Raids oder Werbepausen werden nur akzeptiert, wenn sie als von diesem
 Absender stammend gekennzeichnet sind. Aus dem Chat heraus ist das nicht
 fälschbar, weil der Client jeder Zuschauernachricht den echten Namen voranstellt
+
 - die Kennzeichnung sitzt dann nicht mehr an der Stelle, an der sie zählt.
+
 Zusätzlich ist der Name reserviert und kann nie als echter Chatter existieren,
 der Namensraum ist also kollisionsfrei.
 
@@ -90,7 +92,9 @@ idempotent: Hat ein Client sie bereits vorgenommen, passiert nichts weiter, alte
 und neue Clientversionen lassen sich mischen.
 
 **Das Format des Gesprächsverlaufs.** Der Verlauf ist ein zweiter In-Band-Kanal
+
 - eine Zeile pro Gesprächszug, mit Absender und Zeitstempel. Genau das war eine
+
 Lücke: Es genügte, in der eigenen Nachricht eine neue Zeile zu beginnen, um
 weitere Gesprächszüge zu erfinden. Auch Antworten der Bot-Persona. Das
 Sprachmodell ließ sich damit per In-Context-Learning auf eine Historie
