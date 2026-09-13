@@ -129,7 +129,9 @@ Namen, Parameter, erlaubte Werte. Eine Injection hat damit ein wohlgeformtes
 Ziel - sie muss nicht raten, sie liest ab.
 
 Bei Token weiß das Modell, *dass* eine Fähigkeit existiert und wofür sie da ist
+
 - aber nicht, wie daraus eine Aktion wird. Ob der Typ im aktuellen Kontext
+
 überhaupt zulässig ist, wie das Ziel aufgelöst wird, welche Grenzen greifen:
 Diese Semantik lebt vollständig im Server und ist dem Modell nie exponiert.
 
