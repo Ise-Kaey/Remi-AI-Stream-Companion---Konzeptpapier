@@ -103,15 +103,26 @@ Daten das Gerät verlassen:
 
 | Stufe | Wo | Verlässt Daten die Maschine? |
 | --- | --- | --- |
-| Spracherkennung | lokal, auf der CPU | nein - Audio bleibt da |
-| Gedächtnispflege | lokal, abschaltbar | nein |
+| Spracherkennung | frei konfigurierbar, Vorgabe lokal | kommt darauf an - lokaler Erkenner: nichts. Cloud-Erkenner: der Ton selbst. Das Weckwort wird immer lokal erkannt |
+| Gedächtnispflege | frei konfigurierbar, Vorgabe lokal, standardmäßig aus | kommt darauf an - lokal: nichts. Auf einem Endpunkt: je nach Aufgabe die Äußerung, ein ganzer Sitzungsabschnitt, die Figurenbeschreibung oder eine erfundene Anekdote |
 | Haupt-Sprachmodell | frei konfigurierbar | nur bei Cloud-Anbieter |
-| Sprachausgabe | Cloud-Anbieter | ja - Text geht raus |
+| Sprachausgabe | frei konfigurierbar | kommt darauf an - Cloud-Adapter: Text geht raus. Lokaler Adapter: nichts |
 
-Zeigt die Konfiguration auf ein selbst betriebenes Sprachmodell, verlässt außer
-dem Text für die Sprachausgabe nichts mehr die Maschine. Details und die
-wichtige Einschränkung dazu - *was genau in einen Prompt geht* - stehen auf der
-[Datenseite](docs/de/daten.md).
+**Beide Enden der Skala lassen sich einstellen.** Zeigt die Konfiguration auf
+ein selbst betriebenes Sprachmodell und eine lokale Stimme, verlässt bei
+lokaler Erkennung - der Vorgabe - **nichts mehr** die Maschine. Zeigen
+umgekehrt alle vier Stufen auf Dienste, verlässt praktisch alles das Gerät,
+und zwar an **bis zu vier verschiedene Anbieter**: der Ton an den Erkenner,
+der Verlauf an das Sprachmodell, der gesprochene Satz an die Stimme, und je
+nach Aufgabe Abschnitte oder Erfundenes an die Gedächtnispflege.
+
+Eines bleibt bauartbedingt lokal, auch dann: **das Weckwort.** Die Schleife,
+die dauernd mithört, bekommt immer einen Erkenner auf dem Gerät - sonst ginge
+jede Sprachregung im Raum hinaus.
+
+Dazwischen liegt der Normalfall, und die Stufen sind einzeln einstellbar.
+Details und die wichtige Einschränkung dazu - *was genau in einen Prompt
+geht* - stehen auf der [Datenseite](docs/de/daten.md).
 
 ## Was dieses Repository nicht ist
 
@@ -130,4 +141,3 @@ Code nachbauen lassen.
 Die Texte in diesem Repository stehen unter
 [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/deed.de). Die
 beschriebene Software ist davon nicht erfasst.
-
