@@ -103,14 +103,25 @@ the device:
 
 | Stage | Where | Does data leave the machine? |
 | --- | --- | --- |
-| Speech recognition | locally, on the CPU | no — audio stays put |
-| Memory maintenance | locally, can be switched off | no |
+| Speech recognition | freely configurable, local by default | depends — local recognizer: nothing. Cloud recognizer: the audio itself. The wake word is always recognised locally |
+| Memory maintenance | freely configurable, local by default, off by default | it depends - locally: nothing. On an endpoint: depending on the task the utterance, an entire session segment, the character description or an invented anecdote |
 | Main language model | freely configurable | only with a cloud provider |
-| Speech output | cloud provider | yes — text goes out |
+| Speech output | freely configurable | depends — cloud adapter: text goes out. Local adapter: nothing |
 
-If the configuration points at a self-hosted language model, nothing beyond the
-text for speech output leaves the machine. Details, and the important
-qualification — *what exactly goes into a prompt* — are on the
+**Both ends of the scale can be configured.** If the configuration points at a
+self-hosted language model and a local voice, then with local recognition — the
+default — **nothing** leaves the machine any more. Point all four stages at
+services instead, and practically everything leaves the device, to **as many as
+four different providers**: the audio to the recogniser, the history to the
+language model, the spoken sentence to the voice, and depending on the task
+segments or invented material to memory maintenance.
+
+One thing stays local by design even then: **the wake word.** The loop that
+listens continuously always gets a recogniser on the device — otherwise every
+utterance in the room would go out.
+
+The normal case lies in between, and the stages are set individually. Details,
+and the important qualification — *what exactly goes into a prompt* — are on the
 [data page](docs/en/data.md).
 
 ## What this repository is not
