@@ -104,8 +104,8 @@ the device:
 | Stage | Where | Does data leave the machine? |
 | --- | --- | --- |
 | Speech recognition | freely configurable, local by default | depends — local recognizer: nothing. Cloud recognizer: the audio itself. The wake word is always recognised locally |
-| Memory maintenance | freely configurable, local by default, off by default | it depends - locally: nothing. On an endpoint: depending on the task the utterance, an entire session segment, the character description or an invented anecdote |
-| Main language model | freely configurable | only with a cloud provider |
+| Memory maintenance | freely configurable, local by default, off by default | it depends - locally: nothing. On an endpoint: depending on the task the utterance, an entire session segment, the last exchange, the character description or an invented anecdote |
+| Main language model | freely configurable | only with a cloud provider — the pre-decision in chat (rules, the last 15 entries, the new message) goes there too, unless it has an endpoint of its own |
 | Speech output | freely configurable | depends — cloud adapter: text goes out. Local adapter: nothing |
 
 **Both ends of the scale can be configured.** If the configuration points at a
@@ -118,7 +118,9 @@ segments or invented material to memory maintenance.
 
 One thing stays local by design even then: **the wake word.** The loop that
 listens continuously always gets a recogniser on the device — otherwise every
-utterance in the room would go out.
+utterance in the room would go out. The same goes for the **voice check**: the
+streamer's voice profile — number series, no recordings — is created and
+computed only on the device.
 
 The normal case lies in between, and the stages are set individually. Details,
 and the important qualification — *what exactly goes into a prompt* — are on the
