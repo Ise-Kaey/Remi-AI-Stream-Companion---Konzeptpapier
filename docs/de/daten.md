@@ -10,14 +10,17 @@ verlässt.
 
 ## Was gespeichert wird
 
-Fünf Kategorien, alle lokal als Dateien auf der Maschine des Betreibers:
+Acht Kategorien, alle lokal als Dateien auf der Maschine des Betreibers:
 
 | Kategorie | Inhalt |
 | --- | --- |
 | **Gesprächsverlauf** | Was gesagt und geantwortet wurde, mit Absender und Zeitpunkt. Sprache und Chat teilen sich einen Verlauf |
-| **Zuschauerprofile** | Anzeigename, bevorzugte Anrede, hinterlegtes Geschlecht, optional Geburtstag, die gewünschte Sprache der Anrede, dazu kategorisierte Merkmale („mag Katzen"), ein Freitextfeld und eine Einstufung der Person durch den Agenten (etwa *vertraut*, *fremd*, *skeptisch*). Dazu drei **Zeitstempel**: wann jemand zum ersten Mal auftrat, wann er zuletzt begrüßt wurde und wann zuletzt zum Geburtstag gratuliert wurde |
-| **Moderationsvorgänge** | Verstöße mit Zeitpunkt, Grund und ausgelöster Maßnahme, dazu eine Eskalationsstufe |
+| **Tagebuch** | Die verdichtete Fassung älterer Gesprächsabschnitte: eine kurze Erzählung aus Sicht des Agenten, dazu Stichpunkte - Themen, Stimmung, was offen blieb und was davon seither erledigt ist. **Stark verdichtet:** ein Abschnitt von bis zu rund 50 000 Wortbestandteilen wird zu einigen hundert, Einzelheiten wie Vorlieben gehen dabei unter. Wer im Gespräch vorkam, kann darin unter seinem Anzeigenamen genannt sein |
+| **Zuschauerprofile** | Anzeigename, bevorzugte Anrede, hinterlegtes Geschlecht, optional Geburtstag, die gewünschte Sprache der Anrede, der Zeitpunkt der letzten Nachricht, dazu kategorisierte Merkmale („mag Katzen"), ein Freitextfeld und eine Einstufung der Person durch den Agenten (etwa *vertraut*, *fremd*, *skeptisch*). Dazu drei **Zeitstempel**: wann jemand zum ersten Mal auftrat, wann er zuletzt begrüßt wurde und wann zuletzt zum Geburtstag gratuliert wurde |
+| **Moderationsvorgänge** | Verstöße mit Zeitpunkt, Grund und ausgelöster Maßnahme, dazu eine Eskalationsstufe und der Zeitpunkt, zu dem sie zuletzt geändert wurde |
 | **Gemeinschaftswissen** | Fakten über die Community als Ganzes, nicht einer Person zugeordnet |
+| **Erfundene Vergangenheit** | Die Hintergrundgeschichte der Persona: Anekdoten, die der Agent selbst erfunden und als solche ausgezeichnet hat, damit er sich später nicht widerspricht. Sie betreffen die Figur, nicht die Zuschauer - als Person kommt darin in der Regel nur der Streamer vor, der im Systemprompt als ihr Gegenüber hinterlegt ist (etwa: wie sich beide kennengelernt haben) |
+| **Stimmprofil** (optional) | Zahlenreihen, die die Stimme des **Streamers** beschreiben - errechnet aus sechs Aufnahmen, die er beim Einrichten selbst spricht. **Die Aufnahmen selbst werden nicht gespeichert**, nur diese Zahlen. Sie sind biometrische Daten (DSGVO Art. 9). Zuschauer betrifft das Profil nie; ihre Stimmen werden geprüft, aber nicht festgehalten, siehe [unten](#die-stimmprüfung-bleibt-auf-dem-gerät). Zur Gegenprobe kommen Zahlenreihen fremder Stimmen aus einem offenen Korpus dazu |
 | **Betriebsprotokolle** | Ablauf des Betriebs - was fehlschlug, was ausgelöst wurde. Gesprächsinhalte stehen dort nicht, siehe [unten](#betriebsprotokolle) |
 
 Bezeichner sind die Anzeigenamen aus dem Chat. Es werden keine Klarnamen,
@@ -35,21 +38,28 @@ nicht mehr auf. Wie er entsteht und warum es ihn gibt, steht bei der
 
 | Kategorie | Aufbewahrung |
 | --- | --- |
-| Gesprächsverlauf | begrenzt, älteste Einträge fallen automatisch heraus. Zwei Grenzen greifen parallel - Anzahl der Einträge und Umfang |
+| Gesprächsverlauf | bis zu einem einstellbaren Umfang. Ist er erreicht, wird der ältere Teil zu einem Tagebucheintrag verdichtet und aus dem Verlauf genommen; der Wortlaut liegt danach noch eine Frist im Archiv (Vorgabe 14 Tage) und wird dann gelöscht |
+| Tagebuch | unbefristet. Einträge, die älter als eine Woche sind (einstellbar), werden zu einem Rückblick zusammengefasst; die ersetzten Einträge liegen eine Frist im Archiv und werden dann gelöscht, der Rückblick bleibt |
 | Zuschauerprofile | unbefristet, bis der Betreiber löscht oder die betroffene Person widerspricht |
 | Moderationsvorgänge | die Eskalationsstufe sinkt zeitgesteuert von selbst; die Vorgänge selbst bleiben |
 | Gemeinschaftswissen | unbefristet |
+| Erfundene Vergangenheit | unbefristet |
+| Stimmprofil | bis der Streamer es im Menü löscht. Es gibt **keine Sicherungskopien**: Löschen entfernt es vollständig |
 | Betriebsprotokolle | feste Frist, ältere Dateien werden beim Start gelöscht |
 
-Der Gesprächsverlauf ist damit die einzige Kategorie mit automatischer
-Verdrängung. Profile bleiben - das ist ihr Zweck, und es ist der Punkt, an dem
-ein Betreiber eine bewusste Entscheidung treffen muss.
+Der **Wortlaut** eines Gesprächs bleibt damit nur befristet - was bleibt, ist
+seine verdichtete Fassung im Tagebuch. Bis 0.6.5.15a stand hier, ältere
+Einträge fielen einfach heraus; seither werden sie zusammengefasst, und die
+Zusammenfassung geht mit jeder Anfrage an das Sprachmodell mit. Profile,
+Tagebuch und erfundene Vergangenheit bleiben - das ist ihr Zweck, und es ist
+der Punkt, an dem ein Betreiber eine bewusste Entscheidung treffen muss.
 
-**Zur Größenordnung.** Der Verlauf ist auf einige hundert Nachrichten begrenzt,
-konfigurierbar; in einem lebhaften Chat sind das Minuten bis Stunden. Zum
+**Zur Größenordnung.** Im Wortlaut hält der Agent einen begrenzten Ausschnitt
+vor, dazu für die Frist des Archivs die zuletzt verdichteten Abschnitte. Zum
 Vergleich: Die Streaming-Plattform selbst hält den vollständigen Chatverlauf
-üblicherweise über Wochen vor. Der Agent speichert also einen kleinen Ausschnitt
-dessen, was ohnehin bereits protokolliert ist.
+üblicherweise über Wochen vor. **Das Tagebuch dagegen reicht weiter zurück**
+als beides - nicht im Wortlaut, aber als Zusammenfassung über die ganze
+Betriebszeit.
 
 Das ist keine Rechtfertigung - der Betreiber ist für seine eigene Verarbeitung
 verantwortlich, unabhängig davon, was die Plattform tut, und beide sind
@@ -158,28 +168,84 @@ dass kein Dritter die Inhalte sieht.** Maßgeblich ist dabei der Zugriff, nicht
 der Besitz — ein gemieteter Server in einem Rechenzentrum gilt als nicht
 vertraulich, weil der Betreiber an die Daten kommt.
 
-### Drei weitere Aufgaben, die je Endpunkt getrennt schaltbar sind
+### Weitere Aufgaben, die je Endpunkt getrennt schaltbar sind
 
 Die Gedächtnispflege ist inzwischen keine einzelne Tätigkeit mehr, sondern ein
-Bündel. Drei davon senden anderes als die Faktenpflege, und wer eine
+Bündel. Diese Aufgaben senden anderes als die Faktenpflege, und wer eine
 Vertraulichkeitsabwägung trifft, sollte sie einzeln ansehen:
 
 | Aufgabe | Was hinausgeht, wenn sie auf einem Endpunkt läuft | Vorgabe |
 | --- | --- | --- |
 | **Verdichtung des Verlaufs** | ein **ganzer Sitzungsabschnitt** statt einer einzelnen Äußerung — in Stücken, damit er in das Kontextfenster passt. Das ist die größte Menge, die an dieser Stelle je übertragen wurde | an, sobald die Gedächtnispflege läuft |
 | **Anfang der Antwort** | zusätzlich zum Zwischenstand der Erkennung auch **die Beschreibung der Figur selbst** — Persönlichkeit, Sprechweise, Regeln. Rund 6400 Wortbestandteile je Aufruf | aus |
-| **Erfundene Vergangenheit** | eine **Anekdote, die der Agent selbst erfunden und als solche ausgezeichnet hat**. Sie kann Namen und Einzelheiten über Anwesende enthalten, weil sie von einer gemeinsamen Vergangenheit erzählt | aus |
+| **Erfundene Vergangenheit** | eine **Anekdote, die der Agent selbst erfunden und als solche ausgezeichnet hat** - aus der Hintergrundgeschichte der Persona. Als Person kommt darin in der Regel nur der Streamer vor | aus |
+| **Erledigt-Prüfung** | nach **jeder Antwort**, solange im jüngsten Tagebucheintrag etwas offen ist: die offenen Punkte und der letzte Wortwechsel - die Nachricht samt Absender und die Antwort darauf | an, sobald die Gedächtnispflege läuft |
+| **Unterbrechen** | während der Agent spricht und jemand dazwischenredet: das Gesagte des Agenten, der Zwischenstand der Erkennung und ein Auszug des Verlaufs | aus |
 
 **Die Figurenbeschreibung ist keine Personendatei**, und sie steht hier trotzdem:
 sie ist der einzige Teil, den der Betreiber selbst geschrieben hat und über den
 er womöglich nicht nachdenkt, wenn er einen Endpunkt einstellt. Was darin an
 Dritten erwähnt wird, geht mit hinaus.
 
-**Die erfundene Vergangenheit ist der unauffälligste Fall.** Sie ist frei
-erfunden und deshalb leicht als harmlos zu lesen — aber sie entsteht aus dem
-Gespräch, und wer darin vorkommt, steht darin. Der Agent hält sie fest, damit
-er sich beim nächsten Mal nicht widerspricht; dieselbe Datei kann also über
-Wochen wachsen.
+**Die erfundene Vergangenheit betrifft die Figur, nicht das Publikum.** Sie ist
+die Hintergrundgeschichte der Persona - Herkunft, Erlebnisse, Eigenheiten -,
+und der einzige Mensch, der darin regelmäßig vorkommt, ist der Streamer: er
+steht im Systemprompt als ihr Gegenüber. Sie entsteht allerdings im Gespräch,
+und ein Zuschauer ist darin nicht ausgeschlossen. Der Agent hält sie fest,
+damit er sich beim nächsten Mal nicht widerspricht; dieselbe Datei kann also
+über Wochen wachsen.
+
+### Die Vorentscheidung im Chat
+
+Seit 0.6.6.40000-alpha steht vor dem Haupt-Sprachmodell eine kleine
+Vorentscheidung: Soll der Agent auf eine Chatnachricht überhaupt antworten?
+Dafür gehen **die Chat-Regeln der Persona, die letzten 15 Einträge des Verlaufs
+und die neue Nachricht** hinaus - an dasselbe Sprachmodell wie die Antwort, oder
+an einen eigenen Endpunkt, wenn der Betreiber einen einstellt.
+
+Sie ist **immer aktiv** und läuft in der Vorgabe über das Haupt-Sprachmodell.
+Damit kommt kein neuer Empfänger hinzu: was dorthin geht, ist ein Ausschnitt
+dessen, was die Antwort ohnehin bekäme. Ein **eigener Endpunkt** dagegen ist
+ein weiterer Anbieter mit eigenem Ausschnitt - wer einen einstellt, sollte ihn
+in der Auftragsverarbeitung mitzählen.
+
+### Die Stimmprüfung bleibt auf dem Gerät
+
+Seit 0.6.6.50000-alpha kann der Agent die Stimme des Streamers kennenlernen.
+Der Streamer spricht dafür beim Einrichten sechs kurze Aufnahmen; daraus
+entsteht das **Stimmprofil** - Zahlenreihen, keine Aufnahmen. Danach wird jede
+Äußerung, die das Mikrofon aufnimmt, mit diesem Profil verglichen. In der
+ersten Ausbaustufe nur gemessen: das Ergebnis steht als Prozentwert im
+Betriebsprotokoll, verworfen wird nichts.
+
+Drei Dinge gelten dabei, und alle drei sind Bauart:
+
+- **Nichts davon verlässt das Gerät.** Das Modell, das die Stimme beschreibt,
+  wird einmal heruntergeladen und rechnet danach auf der CPU. Es gibt keinen
+  Cloud-Weg für diese Prüfung - auch dann nicht, wenn für die Erkennung ein
+  Cloud-Dienst eingestellt ist.
+- **Geprüft wird jede Stimme, festgehalten nur eine.** Auch eine fremde Stimme
+  im Raum wird mit dem Profil verglichen, sonst könnte die Prüfung sie nicht
+  erkennen. Für sie entsteht aber nichts: kein Profil, keine Zahlenreihe, nur
+  eine Zeile mit dem Prozentwert im Protokoll, ohne Namen und ohne Inhalt.
+- **Das Profil gehört dem Streamer und ist abschaltbar.** Die Funktion ist in
+  der Vorgabe aus, das Profil entsteht nur, wenn er es selbst einrichtet, und
+  „Stimmprofil löschen“ entfernt es ohne Sicherungskopie.
+
+Der Widerspruchsweg der Zuschauer berührt das Profil nicht - es enthält keine
+Zuschauerdaten.
+
+Nach dem Einrichten zeigt eine **Gegenprobe**, wie gut das Profil trennt: Der
+Agent vergleicht es mit Sätzen in seiner eigenen Stimme und mit 20 fremden
+Stimmen. Dafür entstehen zwei lokale Bestände - die **Tonablage** mit den
+einmal erzeugten Sätzen (ist die Stimme des Agenten der Klon einer echten
+Person, ist es deren Stimme) und die **Gegenprobe** mit den Zahlenreihen der
+fremden Stimmen. Diese stammen aus LibriSpeech, einem offenen Hörbuchkorpus
+unter CC BY 4.0; abgeholt wird beim Einrichten **einmal** über Hugging Face,
+der Ton wird verworfen, nur die Zahlen bleiben. Die Datensatzkarte verlangt,
+die Sprecher nicht zu identifizieren - die Gegenprobe fragt nur, ob jemand
+**nicht** der Streamer ist. Ist die Sprachausgabe ein Cloud-Dienst, gehen
+außerdem **einmal** drei feste Sätze dorthin, nach Rückfrage.
 
 ### Vollständig lokaler Betrieb
 
@@ -330,6 +396,7 @@ aufgeschlüsselt:
 | Hinterlegtes Geschlecht | **bleibt** |
 | Einstufung durch den Agenten | **bleibt** |
 | Zeitpunkt des ersten Auftretens | **bleibt** |
+| Zeitpunkt der letzten Nachricht | **bleibt** |
 
 Die Trennlinie folgt einem Prinzip: Geleert wird, was der Agent über eine Person
 *angesammelt* hat. Erhalten bleibt, was der Betrieb braucht, um überhaupt noch
@@ -343,6 +410,12 @@ dafür, dass jemand *heute schon* begrüßt wurde - ohne ihn würde der Agent be
 jeder Nachricht aufs Neue willkommen heißen. Er speichert keinen Inhalt,
 sondern nur, dass etwas bereits geschehen ist. Wer ihn löschte, bekäme nicht
 weniger Aufmerksamkeit, sondern mehr.
+
+**Der Zeitpunkt der letzten Nachricht bleibt aus demselben Grund.** Er sagt dem
+Agenten, ob jemand gerade im Gespräch ist oder lange weg war. Ohne ihn würde die
+Person behandelt, als käme sie gerade neu dazu. Er speichert keinen Inhalt, nur
+einen Zeitpunkt, und wird bei jeder Chatnachricht überschrieben; ein Verlauf
+vergangener Besuche entsteht daraus nicht.
 
 **Der Geburtstagsvermerk wird dagegen mitgelöscht**, und das ist die
 Gegenprobe auf dasselbe Prinzip: Er hält fest, wann zuletzt gratuliert wurde,
@@ -413,7 +486,7 @@ Damit gilt für die Moderation dieselbe Beweglichkeit wie für die Einstufung:
 sie rastet nicht ein. Was bleibt, ist das Protokoll - was sich ändert, ist die
 Folge daraus.
 
-### Der Gesprächsverlauf bleibt unberührt
+### Verlauf, Tagebuch und erfundene Vergangenheit bleiben unberührt
 
 Der Widerspruch wirkt auf das Profil, nicht auf den laufenden Verlauf. Das ist
 kein Versehen, sondern folgt aus dem, was der Verlauf ist: ein
@@ -423,13 +496,35 @@ Frage stehen und Bezüge laufen ins Leere - und genau diese Bezüge sind es, die
 eine Reaktion passend machen. Ein bereinigter Verlauf wäre kein datensparsamerer
 Verlauf, sondern ein defekter.
 
-Entschärft wird das durch die Aufbewahrung selbst. Der Verlauf ist auf einige
-hundert Nachrichten begrenzt und rollt in einem aktiven Chat binnen Stunden
-durch. Er braucht keine Löschfunktion, weil er ohnehin nur ein kurzes Fenster
-ist - die Verdrängung erledigt schneller, was ein Löschbegehren erst anstoßen
-müsste.
+Bis 0.6.5.15a entschärfte das die Aufbewahrung selbst: der Verlauf rollte in
+einem aktiven Chat binnen Stunden durch, und die Verdrängung erledigte
+schneller, was ein Löschbegehren erst hätte anstoßen müssen. **Das gilt nicht
+mehr.** Seither rollt der Verlauf nicht, er wird ab einem einstellbaren Umfang
+geschnitten, und der ältere Teil wird zu einem Tagebucheintrag verdichtet. Der
+Wortlaut verschwindet nach der Frist des Archivs (Vorgabe 14 Tage) - die
+Zusammenfassung bleibt, und mit ihr, wer darin genannt ist.
 
-Der dritte Grund wiegt schwerer als die beiden ersten: Ein Widerspruch, der den
+**Der Widerspruch erreicht das Tagebuch nicht, und ebenso wenig die erfundene
+Vergangenheit.** Er gilt dem, was der Agent im Chat über eine Person
+*angesammelt* hat - Vorlieben, Merkmale, Freitext im Profil. Das Tagebuch
+ist keine solche Sammlung, sondern eine Zusammenfassung des Geschehens, und
+die Verdichtung selbst begrenzt, was darin über Einzelne stehen kann: aus
+bis zu rund 50 000 Wortbestandteilen werden einige hundert, und Vorlieben
+überleben das nicht. Was bleibt, ist allenfalls, dass jemand unter seinem
+Anzeigenamen am Gespräch teilnahm.
+
+**Und dieser Name ist kein fester Bezug.** Jeder kann seinen Anzeigenamen
+jederzeit ändern; anders als die Streaming-Plattform erkennt der Agent eine
+Person unter einem geänderten Namen nicht wieder. Ein alter Tagebucheintrag
+lässt sich dann keinem aktuellen Profil mehr zuordnen.
+
+Die erfundene Vergangenheit ist die Hintergrundgeschichte der Persona und
+betrifft Zuschauer in der Regel gar nicht. Beide sind **nicht befristet**;
+wer dort trotzdem einen Eintrag entfernt haben möchte, wendet sich an den
+Betreiber, siehe unten.
+
+Der dritte Grund wiegt schwerer als die beiden ersten, und er gilt für den
+Verlauf unverändert: Ein Widerspruch, der den
 Verlauf mitnähme, wäre ein Freischein. Der Verlauf ist das Fenster, in dem ein
 Verstoß überhaupt sichtbar ist, bevor er als Moderationsvorgang festgehalten
 wird. Wer ihn auf Zuruf leeren könnte, könnte den Beleg für sein Verhalten
@@ -457,6 +552,10 @@ weil es nie ankommt:
   Server könnte niemanden sperren, selbst wenn er wollte.
 - **Keine Identitäten.** Gespeichert werden Chat-Anzeigenamen. Ob dahinter eine
   reale Person steht und welche, weiß der Server nicht.
+- **Keine sensiblen Angaben im Chat.** Die Chatregeln, die vor dem ersten
+  Schreiben zu bestätigen sind, untersagen ausdrücklich, sensible Daten wie
+  eine Adresse zu nennen. Was der Agent nie zu lesen bekommt, kann er weder
+  speichern noch verdichten.
 
 Das ist kein Zufall, sondern folgt aus der Architektur: Der Client liefert
 Ereignisse und führt Aktionen aus, der Server hält den Zustand. Wo keine
@@ -482,7 +581,9 @@ Was ein Betreiber vor dem Produktivbetrieb für sich klären sollte:
 - **Auftragsverarbeitung.** Welche Anbieter sind eingebunden, was übertragen
   sie, und liegen die nötigen Vereinbarungen vor? Es können **vier** sein --
   Erkennung, Sprachmodell, Stimme und Gedächtnispflege sind getrennt
-  einstellbar und müssen nicht demselben Haus gehören. Der Betrieb mit einem
+  einstellbar und müssen nicht demselben Haus gehören. Bekommt die
+  [Vorentscheidung im Chat](#die-vorentscheidung-im-chat) einen eigenen
+  Endpunkt, ist es ein fünfter. Der Betrieb mit einem
   lokalen Sprachmodell verkleinert diese Frage erheblich; der vollständig
   lokale Betrieb lässt sie entfallen.
 - **Auskunft und Löschung.** Wie wird eine Anfrage beantwortet, und wer kommt an
