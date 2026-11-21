@@ -9,14 +9,17 @@ data that is, how long it stays, and what of it leaves the machine.
 
 ## What is stored
 
-Five categories, all held locally as files on the operator's machine:
+Eight categories, all held locally as files on the operator's machine:
 
 | Category | Contents |
 | --- | --- |
 | **Conversation history** | What was said and answered, with sender and time. Voice and chat share one history |
-| **Viewer profiles** | Display name, preferred form of address, recorded gender, optionally a birthday, the language they wish to be addressed in, plus categorised traits ("likes cats"), a free-text field, and the agent's standing assessment of the person (such as *trusted*, *stranger*, *sceptical*). Plus three **timestamps**: when someone first appeared, when they were last greeted, and when they were last wished a happy birthday |
-| **Moderation records** | Infractions with time, reason and the measure taken, plus an escalation level |
+| **Diary** | The condensed version of older conversation segments: a short narrative from the agent's point of view, plus key points - topics, mood, what remained open and which of it has been settled since. **Heavily condensed:** a segment of up to around 50,000 word fragments becomes a few hundred, and details such as preferences are lost on the way. Whoever came up in the conversation may be named in it by their display name |
+| **Viewer profiles** | Display name, preferred form of address, recorded gender, optionally a birthday, the language they wish to be addressed in, the time of their last message, plus categorised traits ("likes cats"), a free-text field, and the agent's standing assessment of the person (such as *trusted*, *stranger*, *sceptical*). Plus three **timestamps**: when someone first appeared, when they were last greeted, and when they were last wished a happy birthday |
+| **Moderation records** | Infractions with time, reason and the measure taken, plus an escalation level and the time it last changed |
 | **Community knowledge** | Facts about the community as a whole, not attributed to any person |
+| **Invented past** | The persona's backstory: anecdotes the agent invented and marked as such itself, so as not to contradict itself later. They concern the character, not the viewers - the only person who usually appears in them is the streamer, who is set in the system prompt as her counterpart (for instance: how the two met) |
+| **Voice profile** (optional) | Number series describing the **streamer's** voice - computed from six recordings they speak themselves during setup. **The recordings themselves are not stored**, only these numbers. They are biometric data (GDPR Art. 9). The profile never concerns viewers; their voices are checked but not kept, see [below](#the-voice-check-stays-on-the-device). The counter-check adds number series of foreign voices from an open corpus |
 | **Operational logs** | The course of operation - what failed, what was triggered. Conversation content does not appear there, see [below](#operational-logs) |
 
 Identifiers are the display names from chat. No real names, e-mail addresses,
@@ -34,20 +37,27 @@ loop](technology.md#the-feedback-loop).
 
 | Category | Retention |
 | --- | --- |
-| Conversation history | bounded; the oldest entries drop out automatically. Two limits apply in parallel - number of entries and volume |
+| Conversation history | up to a configurable volume. Once it is reached, the older part is condensed into a diary entry and taken out of the history; the verbatim text then stays in an archive for a period (default 14 days) and is deleted |
+| Diary | indefinite. Entries older than a week (configurable) are combined into a retrospective; the replaced entries stay in an archive for a period and are then deleted, the retrospective remains |
 | Viewer profiles | indefinite, until the operator deletes or the person concerned objects |
 | Moderation records | the escalation level decays automatically over time; the records themselves remain |
 | Community knowledge | indefinite |
+| Invented past | indefinite |
+| Voice profile | until the streamer deletes it in the menu. There are **no backup copies**: deleting removes it completely |
 | Operational logs | a fixed period; older files are deleted at startup |
 
-The conversation history is thus the only category with automatic eviction.
-Profiles persist - that is their purpose, and it is the point at which an
-operator has to make a conscious decision.
+The **verbatim text** of a conversation is thus kept only for a period - what
+remains is its condensed version in the diary. Up to 0.6.5.15a this said
+older entries simply dropped out; since then they are summarised, and the
+summary goes along with every request to the language model. Profiles, diary
+and invented past persist - that is their purpose, and it is the point at
+which an operator has to make a conscious decision.
 
-**On scale.** The history is bounded to a few hundred messages, configurable; in
-a lively chat that is minutes to hours. For comparison: the streaming platform
-itself typically retains the complete chat log for weeks. The agent therefore
-stores a small excerpt of what is already being logged anyway.
+**On scale.** Verbatim, the agent keeps a bounded excerpt, plus the most
+recently condensed segments for the archive period. For comparison: the
+streaming platform itself typically retains the complete chat log for weeks.
+**The diary, however, reaches further back** than either - not verbatim, but
+as a summary across the whole time of operation.
 
 That is not a justification - the operator is responsible for their own
 processing regardless of what the platform does, and the two are separate
@@ -152,27 +162,82 @@ third party sees the content.** What counts is access, not ownership — a rente
 server in a data centre counts as not confidential, because the operator can
 reach the data.
 
-### Three further tasks, each switchable to its own endpoint
+### Further tasks, each switchable to its own endpoint
 
-Memory maintenance is no longer a single activity but a bundle. Three of its
-tasks send something other than fact-keeping, and anyone weighing
-confidentiality should look at them separately:
+Memory maintenance is no longer a single activity but a bundle. These tasks
+send something other than fact-keeping, and anyone weighing confidentiality
+should look at them separately:
 
 | Task | What goes out if it runs on an endpoint | Default |
 | --- | --- | --- |
 | **Condensing the history** | an **entire session segment** instead of a single utterance — in pieces, so it fits the context window. This is the largest amount ever transmitted at this point | on, once memory maintenance runs |
 | **Opening of the reply** | in addition to the interim recognition result, **the description of the character itself** — personality, manner of speaking, rules. Around 6400 word fragments per call | off |
-| **Invented past** | an **anecdote the agent invented and marked as such itself**. It can contain names and details about those present, because it tells of a shared past | off |
+| **Invented past** | an **anecdote the agent invented and marked as such itself** - from the persona's backstory. The only person who usually appears in it is the streamer | off |
+| **Settled check** | after **every reply**, as long as something is open in the newest diary entry: the open points and the last exchange - the message with its sender and the reply to it | on, once memory maintenance runs |
+| **Interrupting** | while the agent speaks and someone talks in between: what the agent has said, the interim recognition result and an excerpt of the history | off |
 
 **The character description is not a file about people**, and it is listed here
 anyway: it is the one part the operator wrote themselves and may not think about
 when configuring an endpoint. Whatever it mentions about third parties goes out
 with it.
 
-**The invented past is the least conspicuous case.** It is made up and therefore
-easy to read as harmless — but it arises from the conversation, and whoever
-appears in it is in it. The agent keeps it so as not to contradict himself next
-time; that same file can therefore grow over weeks.
+**The invented past concerns the character, not the audience.** It is the
+persona's backstory - origin, experiences, quirks -, and the only human who
+regularly appears in it is the streamer, set in the system prompt as her
+counterpart. It does arise in conversation, though, and a viewer is not ruled
+out. The agent keeps it so as not to contradict itself next time; that same
+file can therefore grow over weeks.
+
+### The pre-decision in chat
+
+Since 0.6.6.40000-alpha a small pre-decision stands in front of the main
+language model: should the agent reply to a chat message at all? For this,
+**the persona's chat rules, the last 15 history entries and the new message**
+go out - to the same language model as the reply, or to an endpoint of its own
+if the operator sets one.
+
+It is **always active** and by default runs through the main language model.
+No new recipient is added that way: what goes there is an excerpt of what the
+reply would receive anyway. An **endpoint of its own**, by contrast, is a
+further provider with its own excerpt - whoever sets one should count it among
+the processors.
+
+### The voice check stays on the device
+
+Since 0.6.6.50000-alpha the agent can learn the streamer's voice. The streamer
+speaks six short recordings during setup; from them the **voice profile**
+arises - number series, no recordings. After that, every utterance the
+microphone picks up is compared with this profile. In the first stage it is
+only measured: the result appears as a percentage in the operational log,
+nothing is discarded.
+
+Three things hold, and all three are by design:
+
+- **None of it leaves the device.** The model that describes the voice is
+  downloaded once and then computes on the CPU. There is no cloud path for this
+  check - not even when a cloud service is set up for recognition.
+- **Every voice is checked, only one is kept.** A foreign voice in the room is
+  compared with the profile too, otherwise the check could not recognise it.
+  Nothing arises for it, though: no profile, no number series, only a line with
+  the percentage in the log, without a name and without content.
+- **The profile belongs to the streamer and can be switched off.** The function
+  is off by default, the profile only exists if they set it up themselves, and
+  "Delete voice profile" removes it without a backup copy.
+
+The viewers' way to object does not touch the profile - it contains no viewer
+data.
+
+After setup a **counter-check** shows how well the profile separates: the agent
+compares it with sentences in its own voice and with 20 foreign voices. Two
+local stores arise for this - the **sound store** with the sentences generated
+once (if the agent's voice is a clone of a real person, it is that person's
+voice) and the **counter-check** with the number series of the foreign voices.
+These come from LibriSpeech, an open audiobook corpus under CC BY 4.0; they are
+fetched **once** during setup via Hugging Face, the sound is discarded, only the
+numbers remain. The dataset card asks not to identify the speakers - the
+counter-check only asks whether someone is **not** the streamer. If the voice
+output is a cloud service, three fixed sentences also go there **once**, after
+asking.
 
 ### Fully local operation
 
@@ -318,6 +383,7 @@ important qualification on this page, so it is broken down in full:
 | Recorded gender | **retained** |
 | The agent's assessment | **retained** |
 | Time first seen | **retained** |
+| Time of the last message | **retained** |
 
 The dividing line follows a principle: what is cleared is what the agent has
 *accumulated* about a person. What is retained is what operation needs in order
@@ -330,6 +396,12 @@ impressions: it prevents intrusiveness.** It is the marker that someone has
 *already* been greeted today - without it the agent would welcome them anew with
 every message. It stores no content, only that something has already happened.
 Deleting it would not bring less attention, but more.
+
+**The time of the last message stays for the same reason.** It tells the agent
+whether someone is in a conversation right now or has been away for long. Without
+it the person would be treated as if they had just arrived. It stores no content,
+only a point in time, and is overwritten with every chat message; no record of
+past visits arises from it.
 
 **The birthday marker, by contrast, is cleared along with the rest**, and that
 is the counter-test of the same principle: it records when congratulations were
@@ -397,7 +469,7 @@ administrative act.
 Moderation thus has the same mobility as the classification: it does not lock
 in. What remains is the record - what changes is what follows from it.
 
-### The conversation history is left untouched
+### History, diary and invented past are left untouched
 
 Objecting acts on the profile, not on the running history. That is not an
 oversight but follows from what the history is: a **conversation transcript**,
@@ -406,12 +478,33 @@ and replies are left without questions while references run into nothing - and
 those very references are what make a reaction fit. A purged history would not
 be a more data-minimal history but a broken one.
 
-What defuses this is the retention itself. The history is bounded to a few
-hundred messages and rolls over within hours in an active chat. It needs no
-deletion function because it is only ever a short window - eviction does faster
-what an erasure request would first have to set in motion.
+Up to 0.6.5.15a the retention itself defused this: the history rolled over
+within hours in an active chat, and eviction did faster what an erasure
+request would first have had to set in motion. **That no longer holds.** Since
+then the history does not roll; it is cut once it reaches a configurable
+volume, and the older part is condensed into a diary entry. The verbatim text
+disappears after the archive period (default 14 days) - the summary remains,
+and with it whoever is named in it.
 
-The third reason weighs more than the first two: an objection that took the
+**Objecting does not reach the diary, nor the invented past.** It applies to
+what the agent has *accumulated* about a person in chat - preferences, traits,
+the free-text field of the profile. The diary is no such collection but a
+summary of what happened, and the condensation itself limits what it can hold
+about individuals: up to around 50,000 word fragments become a few hundred,
+and preferences do not survive that. What remains is at most that someone
+took part in the conversation under their display name.
+
+**And that name is no fixed reference.** Anyone can change their display name
+at any time; unlike the streaming platform, the agent does not recognise a
+person under a changed name. An old diary entry can then no longer be linked
+to any current profile.
+
+The invented past is the persona's backstory and usually does not concern
+viewers at all. Both are **not time-limited**; anyone who still wants an entry
+there removed turns to the operator, see below.
+
+The third reason weighs more than the first two, and it applies to the
+history unchanged: an objection that took the
 history with it would be a free pass. The history is the window in which a
 violation is visible at all, before it is recorded as a moderation entry.
 Anyone able to clear it on request could remove the evidence of their own
@@ -438,6 +531,10 @@ arrive:
   anyone even if it wanted to.
 - **No identities.** What is stored are chat display names. Whether a real
   person stands behind one, and which, the server does not know.
+- **No sensitive details in chat.** The chat rules, which have to be accepted
+  before writing for the first time, explicitly forbid sharing sensitive data
+  such as an address. What the agent never gets to read, it can neither store
+  nor condense.
 
 This is not accidental but follows from the architecture: the client delivers
 events and performs actions, the server holds the state. Where there is no
@@ -462,7 +559,8 @@ What an operator should settle before running it in production:
 - **Processors.** Which providers are involved, what do they transmit, and are
   the necessary agreements in place? There can be **four** -- recognition,
   language model, voice and memory maintenance are set separately and need not
-  belong to the same company. Running with a local language model shrinks this
+  belong to the same company. If the [pre-decision in
+  chat](#the-pre-decision-in-chat) gets an endpoint of its own, it is a fifth. Running with a local language model shrinks this
   question considerably; fully local operation removes it.
 - **Access and erasure.** How is a request answered, and who gets at the files?
 - **Retention.** Profiles persist indefinitely. Is that intended?
