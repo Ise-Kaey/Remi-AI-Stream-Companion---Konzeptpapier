@@ -104,8 +104,8 @@ Daten das Gerät verlassen:
 | Stufe | Wo | Verlässt Daten die Maschine? |
 | --- | --- | --- |
 | Spracherkennung | frei konfigurierbar, Vorgabe lokal | kommt darauf an - lokaler Erkenner: nichts. Cloud-Erkenner: der Ton selbst. Das Weckwort wird immer lokal erkannt |
-| Gedächtnispflege | frei konfigurierbar, Vorgabe lokal, standardmäßig aus | kommt darauf an - lokal: nichts. Auf einem Endpunkt: je nach Aufgabe die Äußerung, ein ganzer Sitzungsabschnitt, die Figurenbeschreibung oder eine erfundene Anekdote |
-| Haupt-Sprachmodell | frei konfigurierbar | nur bei Cloud-Anbieter |
+| Gedächtnispflege | frei konfigurierbar, Vorgabe lokal, standardmäßig aus | kommt darauf an - lokal: nichts. Auf einem Endpunkt: je nach Aufgabe die Äußerung, ein ganzer Sitzungsabschnitt, der letzte Wortwechsel, die Figurenbeschreibung oder eine erfundene Anekdote |
+| Haupt-Sprachmodell | frei konfigurierbar | nur bei Cloud-Anbieter - dorthin geht auch die Vorentscheidung im Chat (Regeln, die letzten 15 Einträge, die neue Nachricht), sofern sie keinen eigenen Endpunkt hat |
 | Sprachausgabe | frei konfigurierbar | kommt darauf an - Cloud-Adapter: Text geht raus. Lokaler Adapter: nichts |
 
 **Beide Enden der Skala lassen sich einstellen.** Zeigt die Konfiguration auf
@@ -118,7 +118,9 @@ nach Aufgabe Abschnitte oder Erfundenes an die Gedächtnispflege.
 
 Eines bleibt bauartbedingt lokal, auch dann: **das Weckwort.** Die Schleife,
 die dauernd mithört, bekommt immer einen Erkenner auf dem Gerät - sonst ginge
-jede Sprachregung im Raum hinaus.
+jede Sprachregung im Raum hinaus. Ebenso die **Stimmprüfung**: das Stimmprofil
+des Streamers - Zahlenreihen, keine Aufnahmen - entsteht und rechnet nur auf
+dem Gerät.
 
 Dazwischen liegt der Normalfall, und die Stufen sind einzeln einstellbar.
 Details und die wichtige Einschränkung dazu - *was genau in einen Prompt
